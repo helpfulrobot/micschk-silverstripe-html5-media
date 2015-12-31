@@ -1,9 +1,10 @@
 <?php
 
-class MediaManager extends ModelAdmin {
+class MediaManager extends ModelAdmin
+{
 
     private static $managed_models = array(
-		'Audio',
+        'Audio',
         'Video',
         'TranscodeJob'
     );
@@ -11,5 +12,4 @@ class MediaManager extends ModelAdmin {
     private static $url_segment = 'html5-media';
 
     private static $menu_title = 'HTML5 Media';
-	
 }

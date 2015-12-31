@@ -22,53 +22,66 @@ set webhook = https://app.heywatch.com/pings/54ca174d/micschk
 -> jpg = ftp://user:pass@restruct.nl:21/poster-#num#.jpg, number=1
  */
 
-class TranscodeJob extends DataObject {
-	
-	public static function getOrCreateForTranscodable($TranscodableID){
-		// new transcodejob for every ... transcodejob (no reusing of existing job objects)
+class TranscodeJob extends DataObject
+{
+    
+    public static function getOrCreateForTranscodable($TranscodableID)
+    {
+        // new transcodejob for every ... transcodejob (no reusing of existing job objects)
 //		$job = TranscodeJob::get()->filter("TranscodableID",$TranscodableID)->first();
 //		if($job){ 
 //			return $job;
 //		} else {
-			$job = new TranscodeJob();
-			$job->TranscodableID = $TranscodableID;
-			$job->write();
-			return $job;
+            $job = new TranscodeJob();
+        $job->TranscodableID = $TranscodableID;
+        $job->write();
+        return $job;
 //		}
-	}
-	
-	private static $db = array (
-		"JobID" => "Varchar",
-		"JobStatus" => "Enum('started,done,error','started')",
-		"JobErrorMessage" => "Text",
-		"JobUpdateContent" => "Text", // json/serialized callback post (don't put in db, contains passwords)
-		//"TranscodableID" => "Int",
-		"TranscodableClass" => "Varchar",
-	);
-	
-	private static $has_one = array(
-		"Transcodable" => "TranscodableObject",
-	);
-	
-	private static $summary_fields = array( 
-		"JobID",
-		"JobStatus",
-		"JobErrorCode",
-		"JobErrorMessage",
-		"Transcodable.Name",
-		"TranscodableClass",
-		"Created"
-   	);
-	
+    }
+    
+    private static $db = array(
+        "JobID" => "Varchar",
+        "JobStatus" => "Enum('started,done,error','started')",
+        "JobErrorMessage" => "Text",
+        "JobUpdateContent" => "Text", // json/serialized callback post (don't put in db, contains passwords)
+        //"TranscodableID" => "Int",
+        "TranscodableClass" => "Varchar",
+    );
+    
+    private static $has_one = array(
+        "Transcodable" => "TranscodableObject",
+    );
+    
+    private static $summary_fields = array(
+        "JobID",
+        "JobStatus",
+        "JobErrorCode",
+        "JobErrorMessage",
+        "Transcodable.Name",
+        "TranscodableClass",
+        "Created"
+    );
+    
 //	public function getTranscodable(){
 //		Debug::dump(DataObject::get_by_id($this->TranscodableClass, $this->TranscodableID));
 //		return DataObject::get_by_id($this->TranscodableClass, $this->TranscodableID);
 //	}
-	
-	/* no manual editing */
-	function canCreate($Member = null) { return false; }
-	function canEdit($Member = null) { return true; }
-	function canView($Member = null) { return true; }
-	function canDelete($Member = null) { return false; }
-	
+
+    /* no manual editing */
+    public function canCreate($Member = null)
+    {
+        return false;
+    }
+    public function canEdit($Member = null)
+    {
+        return true;
+    }
+    public function canView($Member = null)
+    {
+        return true;
+    }
+    public function canDelete($Member = null)
+    {
+        return false;
+    }
 }

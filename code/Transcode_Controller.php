@@ -3,7 +3,8 @@
 /**
  * Controller to receive pingbacks from video transcoding jobs
  */
-class Transcode_Controller extends Controller {
+class Transcode_Controller extends Controller
+{
     
     /**
      * URL That you can access this from
@@ -11,87 +12,90 @@ class Transcode_Controller extends Controller {
      * @config
      */
     private static $url_segment = "transcode-log";
-	
+    
     private static $allowed_actions = array(
-		"index",
+        "index",
     );
-	
+    
 //	private static $url_handlers = array(
 //        'transcode-log/$Action/$ID' => 'index'
 //    );
-	
-    public function init() {
+
+    public function init()
+    {
         parent::init();
     }
-	
-    public static function staticAbsoluteLink($action = null) {
+    
+    public static function staticAbsoluteLink($action = null)
+    {
         return Controller::join_links(
             //Director::absoluteURL(BASE_URL),
-			Director::absoluteURL(Director::BaseURL()),
+            Director::absoluteURL(Director::BaseURL()),
             self::$url_segment,
             $action
         );
     }
-	
-	/* Example pings/updates (to be processed by index)
-	{
-	  "id": 898,
-	  "errors": {
-		"output": {
-		  "jpg": "unknown_error"
-		}
-	  },
-	  "output_urls": {
-		"ogv": "",
-		"webm": "",
-		"mp4": ""
-	  }
-	}
-	Or
-	{
-	  "id": 898,
-	  "errors": {
-	  },
-	  "output_urls": {
-		"jpg": [
-		  "ftp://user:pass@restruct.nl:21/test/bird-01.jpg"
-		],
-		"webm": "ftp://user:pass@restruct.nl:21/test/bird.webm",
-		"mp4": "ftp://user:pass@restruct.nl:21/test/bird.mp4",
-		"ogv": "ftp://user:pass@restruct.nl:21/test/bird.ogv"
-	  }
-	}
-	*/
-	public function index(SS_HTTPRequest $request) {
-		
-		if($request->isPOST()){
-			$update = json_decode($request->getBody());
-			$joblog = TranscodeJob::get()->filter('JobID', (int) $update->id)->first();
-			// return if status already is done (some protection)
-			if($joblog->JobStatus!=="started"){ return "Error: job status not started"; }
-			
-			// save full update into log object -- no, may contain passwords etc. -- well, fixed but still...
-			//format_id
-			
-			// load files into appropriate relations
-			$transcodable = $joblog->Transcodable();
-			$transcodable->loadTranscodedFiles();
-			
-			if(count(get_object_vars($update->errors))){
-				$joblog->JobErrorMessage = json_encode($update->errors);
-				$joblog->JobStatus = "error";
-			} else if ($transcodable->transcodingComplete()) {
-				// set status to done when complete...
-				$joblog->JobErrorMessage = "";
-				$joblog->JobStatus = "done";
-			}
-			// write logfile
-			$joblog->write();
-		} else {
-			// this shouldn't happen
-			return "Well hello there...";
-		}
-		return "Updated";
-	}
+    
+    /* Example pings/updates (to be processed by index)
+    {
+      "id": 898,
+      "errors": {
+        "output": {
+          "jpg": "unknown_error"
+        }
+      },
+      "output_urls": {
+        "ogv": "",
+        "webm": "",
+        "mp4": ""
+      }
+    }
+    Or
+    {
+      "id": 898,
+      "errors": {
+      },
+      "output_urls": {
+        "jpg": [
+          "ftp://user:pass@restruct.nl:21/test/bird-01.jpg"
+        ],
+        "webm": "ftp://user:pass@restruct.nl:21/test/bird.webm",
+        "mp4": "ftp://user:pass@restruct.nl:21/test/bird.mp4",
+        "ogv": "ftp://user:pass@restruct.nl:21/test/bird.ogv"
+      }
+    }
+    */
+    public function index(SS_HTTPRequest $request)
+    {
+        if ($request->isPOST()) {
+            $update = json_decode($request->getBody());
+            $joblog = TranscodeJob::get()->filter('JobID', (int) $update->id)->first();
+            // return if status already is done (some protection)
+            if ($joblog->JobStatus!=="started") {
+                return "Error: job status not started";
+            }
+            
+            // save full update into log object -- no, may contain passwords etc. -- well, fixed but still...
+            //format_id
 
+            // load files into appropriate relations
+            $transcodable = $joblog->Transcodable();
+            $transcodable->loadTranscodedFiles();
+            
+            if (count(get_object_vars($update->errors))) {
+                $joblog->JobErrorMessage = json_encode($update->errors);
+                $joblog->JobStatus = "error";
+            } elseif ($transcodable->transcodingComplete()) {
+                // set status to done when complete...
+                $joblog->JobErrorMessage = "";
+                $joblog->JobStatus = "done";
+            }
+            // write logfile
+            $joblog->write();
+        } else {
+            // this shouldn't happen
+            return "Well hello there...";
+        }
+        return "Updated";
+    }
 }
